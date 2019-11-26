@@ -1,6 +1,10 @@
 import React from 'react';
 import './App.css';
 import axios from 'axios';
+import {Button, Card, Container, Row, Col, Accordion} from "react-bootstrap";
+
+import Instructor from './Instructor';
+
 const serverUrl = "http://localhost:3000/api";
 
 
@@ -8,14 +12,89 @@ class Quizzes extends React.Component {
     constructor(){
         super()
         this.state = {
+           quizzes: [],
+           instructor: "",
            questions: [],
-           quizzes: []
+           id: "",
+           newInstructor: {},
+           instructors: [],
+           updateInstructor: {}
            
         }
         this.getQuiz = this.getQuiz.bind(this);
         this.createQuiz = this.createQuiz.bind(this);
         this.createQuestion = this.createQuestion.bind(this);
     }
+
+
+
+
+
+    updateInstructor = e => {
+      e.preventDefault()
+      let id = this.state.updateInstructor.id;
+      let intId = Number(id)
+      axios({
+        url: `${serverUrl}/instructors/${intId}`,
+        method: 'put',
+        data: { updateInstructor: this.state.updateInstructor }
+      })
+        .then(response => {
+          this.setState(prevState => (
+            {
+              instructors: [...prevState.instructors, response.data.instructor]
+            }
+          ))
+        })
+    }
+  
+    onHandleChangeInstructor = e => {
+      let updateInstructor = {
+        [e.target.name]: e.target.value
+      }
+      console.log(updateInstructor.id)
+      this.setState((prevState, currentState) => (
+        { updateInstructor: { ...prevState.updateInstructor, ...updateInstructor } }
+      ))
+    }
+
+
+    handleChange = e => {
+      let id = parseInt(e.target.value);
+      this.setState({ id });
+  };
+
+  
+  getQuestions = e => {
+      e.preventDefault();
+      let id = this.state.id;
+      axios({
+          url: `${serverUrl}/questions/`,
+          method: "get"
+      }).then(response => {
+          this.setState({
+              questions: response.data.questions
+          });
+          console.log(response.data.questions);
+          // console.log(response.data.instructor.quizzes)
+          // console.log('quizzes', this.state.quizzes)
+      });
+  };
+  getQuizzes = e => {
+      e.preventDefault();
+      let id = this.state.id;
+      axios({
+          url: `${serverUrl}/quizzes/${id}`,
+          method: "get"
+      }).then(response => {
+          this.setState({
+              quizzes: response.data.question.questions
+          });
+          console.log(response.data.question.questions);
+          // console.log(response.data.instructor.quizzes)
+          // console.log('quizzes', this.state.quizzes)
+      });
+  };
     
     getQuiz() {
         console.log('getting quiz')
@@ -142,13 +221,46 @@ class Quizzes extends React.Component {
   
 
     render() {
-
+      if (this.state.instructor) {
+        console.log(this.state.instructor);
+        var renderInstructor = `
+                        Name: ${this.state.instructor.name} -- Grade: ${this.state.instructor.grade_level} -- Subject: ${this.state.instructor.subject}
+                    `;
+    }
         console.log(this.state.question)
         console.log(this.state.category)
         console.log(this.state.quizId)
                     
-                    
-                    
+        if (this.state.quizzes) {
+          console.log(this.state.quizzes);
+          var renderQuizzes = this.state.quizzes.map((quiz, index) => {
+              return (
+                  <div key={index}>
+                      <Accordion defaultActiveKey="1">
+                          <Card>
+                              <Card.Header>
+                                  <Accordion.Toggle as={Button} variant="link" eventKey="0">
+                                      Click for Question
+                </Accordion.Toggle>
+                              </Card.Header>
+                              <Accordion.Collapse eventKey="0">
+                                  <Card.Body>
+                                      {" "}
+                                      <ul>
+                                          <li>Question: {quiz.question}</li>
+                                          <li>Correct Answer: {quiz.correct_answer}</li>
+                                          <li>Incorrect Answer 1: {quiz.incorrect_answer1}</li>
+                                          <li>Incorrect Answer 2: {quiz.incorrect_answer2}</li>
+                                          <li>Incorrect Answer 3: {quiz.incorrect_answer3}</li>
+                                      </ul>
+                                  </Card.Body>
+                              </Accordion.Collapse>
+                          </Card>
+                      </Accordion>
+                  </div>
+              );
+          });
+      }         
                     
                     
                    
@@ -177,6 +289,47 @@ class Quizzes extends React.Component {
                 </form>
                 
                 {/* {/* <h1>&#169;Bizzell-Cunningham-Miles-Randall 2019</h1> */}
+
+
+
+
+
+                <h1>Update Instructor</h1>
+                    <form onSubmit={this.updateInstructor} onChange={e => this.onHandleChangeInstructor(e)}>
+                    Name: <input type='text' name='name' />
+                    Subject: <input type='text' name='subject' />
+                    Grade Level: <input type='text' name='grade_level' />
+                    Instructor Id: <input type='text' name='id' />
+                    <input type='submit' value='Update Instructor' />
+                    </form>
+
+
+
+                    {this.state.instructor.name ? <Instructor instructor = {this.state.instructor}/>: null} 
+                    <div>
+                        <form
+                            onSubmit={this.getQuizzes}
+                            onChange={e => this.handleChange(e)}
+                        >
+                            Quiz Id: <input type="text" name="id" />
+                            <input type="submit" value="Get Quiz" />
+                        </form>
+                    </div>
+                    <div>
+                        {/* <Accordion defaultActiveKey="0">
+                        <Card>
+                            <Card.Header>
+                            <Accordion.Toggle as={Button} variant="link" eventKey="0">
+                                Click for Quiz
+                            </Accordion.Toggle>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="0">
+                            <Card.Body> {renderQuizzes}</Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                    </Accordion> */}
+                        {renderQuizzes}
+                    </div>
             </div>
         )
     }

@@ -1,8 +1,7 @@
 import React from 'react';
 import './App.css';
-//import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
-import Home2 from './Home2';
+import Home from './Home';
 import CreateAccount from './CreateAccount';
 
 import Quizzes from './Quizzes';
@@ -16,14 +15,8 @@ class App extends React.Component {
   render() {
     return (
       <Router>
-        <nav className="nav">
-          <Link to="/"> Homepage</Link>{"   "}
-          <Link to="/createaccount"> Create Account </Link>{"   "}
-         
-         <Link to="/Quizzes"> Select Quizzes</Link>{"   "} 
-        </nav>
         <div>
-          <Route exact path="/" component={Home2} />
+          <Route exact path="/" component={Home} />
           <Route path="/CreateAccount" component={CreateAccount} />
           <Route path="/Quizzes" component={Quizzes} /> 
          
