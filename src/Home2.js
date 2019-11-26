@@ -1,6 +1,10 @@
 import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
+
+import Quizzes from './Quizzes'
+import Instructor from './Instructor';
+
 import React, { Component } from "react";
 import "./App.css";
 import axios from "axios";
@@ -11,28 +15,50 @@ class Home2 extends React.Component {
         instructor: "",
         quizzes: [],
         questions: [],
-        id: ""
-    };
+        id: "",
+        newInstructor: {},
+        instructors: [],
+        updateInstructor: {}
+      };
     handleChange = e => {
         let id = parseInt(e.target.value);
         this.setState({ id });
     };
-    getInstructors = e => {
-        e.preventDefault();
-        let id = this.state.id;
+
+
+
+
+    updateInstructor = e => {
+        e.preventDefault()
+        let id = this.state.updateInstructor.id;
+        let intId = Number(id)
         axios({
-            url: `${serverUrl}/instructors/${id}`,
-            method: "get"
-        }).then(response => {
-            this.setState({
-                instructor: response.data.instructor,
-                quizzes: response.data.instructor.quizzes
-            });
-            console.log(response.data);
-            // console.log(response.data.instructor.quizzes)
-            // console.log('quizzes', this.state.quizzes)
-        });
-    };
+          url: `${serverUrl}/instructors/${intId}`,
+          method: 'put',
+          data: { updateInstructor: this.state.updateInstructor }
+        })
+          .then(response => {
+            this.setState(prevState => (
+              {
+                instructors: [...prevState.instructors, response.data.instructor]
+              }
+            ))
+          })
+      }
+    
+      onHandleChangeInstructor = e => {
+        let updateInstructor = {
+          [e.target.name]: e.target.value
+        }
+        console.log(updateInstructor.id)
+        this.setState((prevState, currentState) => (
+          { updateInstructor: { ...prevState.updateInstructor, ...updateInstructor } }
+        ))
+      }
+
+
+
+    
     getQuestions = e => {
         e.preventDefault();
         let id = this.state.id;
@@ -63,6 +89,25 @@ class Home2 extends React.Component {
             // console.log('quizzes', this.state.quizzes)
         });
     };
+
+    getInstructors = e => {
+        e.preventDefault();
+        let id = this.state.id;
+        axios({
+          url: `${serverUrl}/instructors/${id}`,
+          method: "get"
+        }).then(response => {
+          this.setState({
+            instructor: response.data.instructor,
+            quizzes: response.data.instructor.quizzes
+          });
+          console.log(response.data);
+          // console.log(response.data.instructor.quizzes)
+          // console.log('quizzes', this.state.quizzes)
+        });
+      };
+
+
     render() {
         if (this.state.instructor) {
             console.log(this.state.instructor);
@@ -112,14 +157,26 @@ class Home2 extends React.Component {
                         Instructor Id: <input type="text" name="id" />
                         <input type="submit" value="Sign-In" />
                     </form>
-                    <div>{renderInstructor}</div>
+
+                    <h1>Update Instructor</h1>
+                    <form onSubmit={this.updateInstructor} onChange={e => this.onHandleChangeInstructor(e)}>
+                    Name: <input type='text' name='name' />
+                    Subject: <input type='text' name='subject' />
+                    Grade Level: <input type='text' name='grade_level' />
+                    Instructor Id: <input type='text' name='id' />
+                    <input type='submit' value='Update Instructor' />
+                    </form>
+
+
+
+                    {this.state.instructor.name ? <Instructor instructor = {this.state.instructor}/>: null} 
                     <div>
                         <form
                             onSubmit={this.getQuizzes}
                             onChange={e => this.handleChange(e)}
                         >
                             Quiz Id: <input type="text" name="id" />
-                            <input type="submit" value="Get Quizzes" />
+                            <input type="submit" value="Get Quiz" />
                         </form>
                     </div>
                     <div>
