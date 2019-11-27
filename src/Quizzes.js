@@ -337,8 +337,8 @@ axios({
                 onSubmit={this.deleteQuestion}
                 onChange={e => this.onHandleChangeDeleteQuestion(e)}
               >
-                Quiz Id: <input type="text" name="questionId" />
-                <input type="submit" value="Delete Quiz" />
+                Question Id: <input type="text" name="questionId" />
+                <input type="submit" value="Delete Question" />
               </form>
             </Col>
 
