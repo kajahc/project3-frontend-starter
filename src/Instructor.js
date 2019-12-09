@@ -1,7 +1,9 @@
 import React from 'react';
 import './App.css';
 import axios from "axios";
-const serverUrl = "http://localhost:3000/api";
+// const serverUrl = "http://localhost:3000/api";
+const herokuBackendUrl = 'https://backend-teachers-pet-app.herokuapp.com/api'
+const serverUrl = process.env.NODE_ENV === 'production' ? herokuBackendUrl : 'http://localhost:3000/api'
 
 class Instructor extends React.Component {
     constructor(props) {
