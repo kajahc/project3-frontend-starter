@@ -3,7 +3,11 @@ import React, { Component } from "react";
 import "./App.css";
 import axios from "axios";
 import CreateAccount from "./CreateAccount";
-const serverUrl = "http://localhost:3000/api";
+
+const herokuBackendUrl = 'https://backend-teachers-pet-app.herokuapp.com/api'
+const databaseUrl = process.env.NODE_ENV === 'production' ? herokuBackendUrl : 'http://localhost:3000/api'
+
+// const serverUrl = "http://localhost:3000/api";
 //test
 class Home extends React.Component {
   state = {
